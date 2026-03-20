@@ -106,18 +106,18 @@ write_fasta(AgeSeqs, path = "./DSS/aDMC_seq250.fa")
 ### random CpGs
 
 
-randSites <- fread("E:/medaka/MedClock2/5x_60ind_manualFilt.tab")[,1]
-
-randSites.coord <- as.data.frame(str_split_fixed(randSites$coord, ":", 2))[sample(1:nrow(randSites), nrow(ageSites)),]
-
-randSites.gr <- GRanges(randSites.coord$V1, 
-                        IRanges(as.numeric(randSites.coord$V2) - 250, as.numeric(randSites.coord$V2) + 250), 
-                        strand = "*")
-
-
-RandSeqs <- get_sequence(randSites.gr, oryLat)
-RandSeqs
-write_fasta(RandSeqs, path = "./DSS/Random_seq250.fa")
+#randSites <- fread("E:/medaka/MedClock2/5x_60ind_manualFilt.tab")[,1]
+#
+#randSites.coord <- as.data.frame(str_split_fixed(randSites$coord, ":", 2))[sample(1:nrow(randSites), nrow(ageSites)),]
+#
+#randSites.gr <- GRanges(randSites.coord$V1, 
+#                        IRanges(as.numeric(randSites.coord$V2) - 250, as.numeric(randSites.coord$V2) + 250), 
+#                        strand = "*")
+#
+#
+#RandSeqs <- get_sequence(randSites.gr, oryLat)
+#RandSeqs
+#write_fasta(RandSeqs, path = "./DSS/Random_seq250.fa")
 
 
 
