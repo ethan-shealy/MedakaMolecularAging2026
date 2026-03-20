@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' width='273.60pt' height='216.00pt' viewBox='0 0 273.60 216.00'>
+<defs>
+  <style type='text/css'><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+    .svglite text {
+      white-space: pre;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: #FFFFFF;'/>
+<defs>
+  <clipPath id='cpMC4wMHwyNzMuNjB8MC4wMHwyMTYuMDA='>
+    <rect x='0.00' y='0.00' width='273.60' height='216.00' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHwyNzMuNjB8MC4wMHwyMTYuMDA=)'>
+<rect x='0.00' y='0.00' width='273.60' height='216.00' style='stroke-width: 0.75; stroke: #FFFFFF; fill: #FFFFFF;' />
+<rect x='5.48' y='5.48' width='81.63' height='53.49' style='stroke-width: 0.75; fill: #D2D0C2;' />
+<rect x='5.48' y='58.97' width='81.63' height='53.49' style='stroke-width: 0.75; fill: #CCCCCC;' />
+<rect x='87.11' y='5.48' width='81.63' height='53.49' style='stroke-width: 0.75; fill: #FFFF00;' />
+<rect x='87.11' y='58.97' width='81.63' height='53.49' style='stroke-width: 0.75; fill: #D2D0C1;' />
+<text x='46.29' y='36.52' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>312</text>
+<text x='127.92' y='36.52' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>858</text>
+<text x='46.29' y='90.01' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>268</text>
+<text x='127.92' y='90.01' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>315</text>
+<text x='171.57' y='36.52' style='font-size: 12.00px; font-family: "Arial";' textLength='94.06px' lengthAdjust='spacingAndGlyphs'>Negative_aDMCs</text>
+<text x='171.57' y='90.01' style='font-size: 12.00px; font-family: "Arial";' textLength='88.72px' lengthAdjust='spacingAndGlyphs'>Positive_aDMCs</text>
+<text transform='translate(50.59,115.29) rotate(-90)' text-anchor='end' style='font-size: 12.00px; font-family: "Arial";' textLength='92.74px' lengthAdjust='spacingAndGlyphs'>Negative_aDEGs</text>
+<text transform='translate(132.22,115.29) rotate(-90)' text-anchor='end' style='font-size: 12.00px; font-family: "Arial";' textLength='87.39px' lengthAdjust='spacingAndGlyphs'>Positive_aDEGs</text>
+</g>
+</svg>
