@@ -57,13 +57,6 @@ contAgeGenes.annot$score <- contAgeGenes$log2FoldChange[match(contAgeGenes.annot
 
 contAgeGenes.bed <- as.data.frame(contAgeGenes.annot)[,c(1,2,3,8)]
 
-### save these genes for visualizing
-#
-#fwrite(contAgeGenes.bed, "~/Parrott_Lab/medaka_EMseq/Transcripts/Model2_Age_Log_AllSignificantGenes.bedGraph",
-#       sep = "\t", col.names = FALSE, quote = FALSE)
-#
-#nonAgeGenes <- annot[na.omit(match(allGeneNames, annot$gene))]
-#
 
 ### now overlap of all CpGs
 
@@ -83,9 +76,6 @@ rm(CGsites)
 ageDMCs <- read.table("./DSS/SigLogAgeCpGs.tab", sep = "\t", header = TRUE)
 
 ageDMCs.bed <- data.frame(ageDMCs[,c(1, 2, 2)], ageDMCs$pvals*sign(ageDMCs$stat))
-
-fwrite(ageDMCs.bed, file = "~/Parrott_Lab/medaka_EMseq/DSS/SigLogAgeCpGs.bedGraph",
-       quote = FALSE, col.names = FALSE, sep = "\t")
 
 ageDMCs.gr <- GRanges(ageDMCs$chr, IRanges(ageDMCs$pos, ageDMCs$pos), strand = "*")
 

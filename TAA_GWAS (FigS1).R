@@ -217,7 +217,7 @@ GT_TAA <- ggplot(filter(meta.seq, !is.na(GT)), aes(x = GT, y = TAA, color = GT))
 grid.newpage()
 grid.draw(set_panel_size(GT_TAA, width  = unit(2, "in"), height = unit(3, "in")))
 
-ggsave("~/Parrott_Lab/medaka_EMseq/MethTransPaper/PanelSVGs/Fig6/GT_TAA.svg",
+ggsave("./Figures/GT_TAA.svg",
        plot = GT_TAA, device = "svg", width = 2.5, height = 3, units = "in")
 
 
@@ -229,38 +229,12 @@ GT_EA <- ggplot(filter(meta.seq, !is.na(GT)), aes(x = Age, y = TA_Est, color = G
 grid.newpage()
 grid.draw(set_panel_size(GT_EA, width  = unit(4, "in"), height = unit(3, "in")))
 
-ggsave("~/Parrott_Lab/medaka_EMseq/MethTransPaper/PanelSVGs/Fig6/GT_TA_Est.svg",
+ggsave("./Figures/GT_TA_Est.svg",
        plot = GT_EA, device = "svg", width = 5, height = 3, units = "in")
 
 
 lm.test <- lm(TA_Est ~ Age + Gonad_sex + as.numeric(as.character(GT)), data = meta.seq)
 summary(lm.test)
-
-
-### Get variant effect predictor info
-
-SNPs_in_region <- gwas_sorted$SNPID[which(gwas_sorted$TAA > 4.77)]
-SNPs_in_region
-
-vep <- fread("E:/medaka/Genotyping/VEP_results.txt")[,c(2:12, 15:19, 21:27, 33, 34, 38)]
-vep$Location <- str_remove_all(vep$Location, "-.*$") %>% str_replace_all(":", "_")
-head(vep$Location)
-
-vep_impacts_grouped <- vep %>%
-  group_by(Location) %>%
-  summarise(all_Impacts = paste(unique(IMPACT), collapse = ", "),
-            all_Consequences = paste(unique(Consequence), collapse = ", "), 
-            .groups = "drop")
-
-vep$IMPACT <- vep_impacts_grouped$all_Impacts[match(vep$Location, vep_impacts_grouped$Location)]
-vep$Consequence <- vep_impacts_grouped$all_Consequences[match(vep$Location, vep_impacts_grouped$Location)]
-#vep <- vep[-which(duplicated(vep$Location)),]
-
-topSNPs <- vep[which(Location %in% SNPs_in_region), c(1,18,5,3,4,10,15)]
-topSNPs$Score <- gwas_sorted$TAA[match(topSNPs$Location, gwas_sorted$SNPID)]
-
-sjPlot::tab_df(topSNPs[order(topSNPs$Score, decreasing = TRUE),]) ### Plot of top SNPs
-
 
 
 ### What genes DO show association in expression with the identified genotype?
