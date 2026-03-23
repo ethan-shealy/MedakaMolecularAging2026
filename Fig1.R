@@ -486,19 +486,18 @@ actual.fitted <- data.frame(dat.clean[-index,], fitted)
 R2.train <- cor(fitted, train.age)^2
 
 ##get the error associated with each predicted age
-actual.fitted$trainerrors <- (actual.fitted$fitted - actual.fitted$Age)
-actual.fitted$abserror <- abs(actual.fitted$trainerrors)
-prom.train_error <- mean(actual.fitted$abserror)
+
+prom.train_error <- mean(abs(actual.fitted$fitted - actual.fitted$Age))
 
 #predicted values for test set
 predicted <- inv_ages(predict(age.cv, test.prom, s=best_lambda))
 
 #actual by predicted values for training data
-actual.predicted <- data.frame(dat.clean[index,], predicted)
+actual.predicted <- data.frame(dat.clean[index,], "fitted" = predicted)
 
 ##get the error associated with each predicted age
-prom.predicted_age <- actual.predicted$predicted
-prom.testerror <- (actual.predicted$predicted - actual.predicted$Age)
+prom.predicted_age <- actual.predicted$fitted
+prom.testerror <- (actual.predicted$fitted - actual.predicted$Age)
 prom.abs_error <- abs(prom.testerror)
 
 
@@ -513,8 +512,11 @@ coeffs.format <- data.frame(stringr::str_split_fixed(coeffs.df$name, ":", 2))[-1
 
 options(scipen = 99)
 
-coeffs.bed <- data.frame(coeffs.format$X1, as.numeric(coeffs.format$X2)-1, coeffs.format$X2, coeffs.df$coefficient[-1])
-coeffs.bed <- rbind(c("Intercept", NA, NA, coeffs.df$coefficient[1]), coeffs.bed)
+coeffs.bed <- data.frame(coeffs.format$X1, coeffs.df$coefficient[-1])
+coeffs.bed <- rbind(c("Intercept", coeffs.df$coefficient[1]), coeffs.bed)
+
+write.table(coeffs.bed, "./Clocks/ElasticNet_Promoter_coeffs.tsv", 
+          quote = FALSE, sep = "\t")
 
 #### GO analysis
 #library(gprofiler2)
@@ -535,12 +537,12 @@ coeffs.bed <- rbind(c("Intercept", NA, NA, coeffs.df$coefficient[1]), coeffs.bed
 trainlm <- lm(actual.fitted$fitted ~ actual.fitted$Age, data = actual.fitted)
 summary(trainlm)
 
-testlm <- lm(actual.predicted$predicted ~ actual.predicted$Age, data = actual.predicted)
+testlm <- lm(actual.predicted$fitted ~ actual.predicted$Age, data = actual.predicted)
 summary(testlm)
 
 ##prom Test
 
-plot.prom.test <- ggplot(data=actual.predicted, aes(x=Age, y=predicted)) +
+plot.prom.test <- ggplot(data=actual.predicted, aes(x=Age, y=fitted)) +
   #geom_smooth(method=lm, na.rm = TRUE, fullrange= TRUE, aes(group=1),colour="blue") + 
   geom_point() + ylim(1, 29) +
   theme(panel.grid.major = element_line(colour = "grey80"),
@@ -568,6 +570,12 @@ ggplot(coeffs.df[-1,], aes(x = reorder(name, coefficient), y = coefficient)) +
   #scale_y_continuous(limits = c(-0.0045, 0.012), breaks = seq(-0.004, 0.012, 0.001)) +
   labs(x = "Predictors (n = 56)", y = "Beta coefficient")
 
+promoterClock.res <- data.frame(rbind(actual.fitted, actual.predicted), 
+                                "Set" = c(rep("train", nrow(actual.fitted)), 
+                                          rep("test", nrow(actual.predicted))))
+
+write.csv(promoterClock.res, file = "./Clocks/Promoter_RepClock_res.csv", 
+          quote = FALSE)
 
 ################################################################ LOOCV
 
@@ -676,6 +684,8 @@ train.entropy <- t(cpg.entropy)[-index,] ## take all that are not in the test se
 train.age <- dat.seq$AgeTrans[-index]
 hist(train.age)
 
+colnames(train.entropy) <- CpG.imputed$coord
+
 gc()
 
 #using 10 fold cross validation to estimate the lambda parameter 
@@ -700,19 +710,17 @@ actual.fitted <- data.frame(dat.seq[-index,], fitted)
 R2.train <- cor(fitted, train.age)^2
 
 ##get the error associated with each predicted age
-actual.fitted$trainerrors <- (actual.fitted$fitted - actual.fitted$Age)
-actual.fitted$abserror <- abs(actual.fitted$trainerrors)
-entropy.train_error <- mean(actual.fitted$abserror)
+entropy.train_error <- mean(abs(actual.fitted$fitted - actual.fitted$Age))
 
 #predicted values for test set
 predicted <- inv_ages(predict(age.cv, test.entropy, s=best_lambda))
 
 #actual by predicted values for training data
-actual.predicted <- data.frame(dat.seq[index,], predicted)
+actual.predicted <- data.frame(dat.seq[index,], "fitted" = predicted)
 
 ##get the error associated with each predicted age
-entropy.predicted_age <- actual.predicted$predicted
-entropy.testerror <- (actual.predicted$predicted - actual.predicted$Age)
+entropy.predicted_age <- actual.predicted$fitted
+entropy.testerror <- (actual.predicted$fitted - actual.predicted$Age)
 entropy.abs_error <- abs(entropy.testerror)
 
 
@@ -730,18 +738,20 @@ options(scipen = 99)
 coeffs.bed <- data.frame(coeffs.format$X1, as.numeric(coeffs.format$X2)-1, coeffs.format$X2, coeffs.df$coefficient[-1])
 coeffs.bed <- rbind(c("Intercept", NA, NA, coeffs.df$coefficient[1]), coeffs.bed)
 
+write.table(coeffs.bed, "./Clocks/ElasticNet_Entropy_coeffs.tsv", 
+            quote = FALSE, sep = "\t")
 
 options(scipen = 3)
 
 #### PLOT CLOCKs
 library(ggpubr)
 
-testlm <- lm(actual.predicted$predicted ~ actual.predicted$Age, data = actual.predicted)
+testlm <- lm(actual.predicted$fitted ~ actual.predicted$Age, data = actual.predicted)
 summary(testlm)
 
 ##entropy Test
 
-plot.entropy.test <- ggplot(data=actual.predicted, aes(x=Age, y=predicted)) +
+plot.entropy.test <- ggplot(data=actual.predicted, aes(x=Age, y=fitted)) +
   geom_point() + 
   #geom_smooth(method=lm, na.rm = TRUE, fullrange= TRUE, aes(group=1),colour="black") + 
   labs(x = "Actual Age", y = "Predicted Epigenetic Age") +
@@ -758,7 +768,12 @@ grid.draw(set_panel_size(plot.entropy.test, width  = unit(1.5, "in"), height = u
 ggsave("./Figures/1H.svg",
        plot = plot.entropy.test, device = "svg", width = 1.5, height = 1.5, units = "in")
 
+entropyClock.res <- data.frame(rbind(actual.fitted, actual.predicted), 
+                                "Set" = c(rep("train", nrow(actual.fitted)), 
+                                          rep("test", nrow(actual.predicted))))
 
+write.csv(entropyClock.res, file = "./Clocks/Entropy_RepClock_res.csv", 
+          quote = FALSE)
 
 ############# Entropy LOOCV
 age.cv <- cv.glmnet(t(cpg.entropy), 

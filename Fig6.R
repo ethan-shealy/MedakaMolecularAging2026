@@ -1,8 +1,11 @@
-
 library(matrixStats)
 library(tidyverse)
 library(data.table)
 library(ggpubr)
+library(grid)
+library(egg)
+
+setwd("")
 
 theme_set(theme_bw() + 
             theme(legend.title = element_text(size=16,face="bold"),
@@ -30,7 +33,7 @@ samples <- colnames(CpG)
 
 CpG <- CpG[,match(meta.seq$ID, samples)]
 
-clockSites <- read.table("~/Parrott_Lab/medaka_EMseq/MethTransPaper/Clocks/ElasticNet_DNAm_AgeTrans_sites.bedGraph")[-1,]
+clockSites <- read.table("./Clocks/ElasticNet_DNAm_AgeTrans_sites.bedGraph")[-1,]
 
 clockSites$name <- paste0(clockSites$V1, ":", clockSites$V3)
 
@@ -73,22 +76,38 @@ clockSites$GenotypeEffectPerc <- abs(clockSites$GenotypeEffect) / sum(abs(clockS
 
 clockSites$NFIX_Assoc <- modelWide$NFIX_Assoc[match(clockSites$name, modelWide$response)]
 
-ggplot(clockSites, aes(x = NFIX_Assoc, y = abs(V4), fill = NFIX_Assoc)) + 
-  stat_summary(fun = "mean", geom = "col", size = 1) +
-  geom_jitter(width = 0.2, color = "grey30") + stat_pwc(label = "p = {p}", y.position = 0.0115) +
-  stat_summary(fun.data = "mean_cl_boot", geom = "errorbar", width = 0.2, linewidth = 2) + 
-  labs(x = "NFIX Associated?", y = "Absolute Clock Coefficient") + 
-  scale_fill_manual(values = c("blue", "red")) +  
-  theme(legend.position = "none")
+
+f1 <- ggplot(clockSites, aes(x = NFIX_Assoc, y = abs(V4), fill = NFIX_Assoc)) + 
+        stat_summary(fun = "mean", geom = "col", size = 1) +
+        geom_jitter(width = 0.2, color = "grey30") + stat_pwc(label = "p = {p}", y.position = 0.0115) +
+        stat_summary(fun.data = "mean_cl_boot", geom = "errorbar", width = 0.2, linewidth = 2) + 
+        labs(x = "NFIX Associated?", y = "Absolute Clock Coefficient") + 
+        scale_fill_manual(values = c("blue", "red")) +  
+        theme(legend.position = "none")
+
+grid.newpage()
+grid.draw(set_panel_size(f1, width  = unit(1.5, "in"), height = unit(3, "in")))
 
 
-ggplot(clockSites, aes(x = NFIX_Assoc, y = abs(GenotypeEffect), fill = NFIX_Assoc)) + 
-  stat_summary(fun = "mean", geom = "col", size = 1) +
-  geom_jitter(width = 0.2, color = "grey30") + stat_pwc(label = "p = {p}") +
-  stat_summary(fun.data = "mean_cl_boot", geom = "errorbar", width = 0.2, linewidth = 2) + 
-  labs(x = "NFIX Associated?", y = "Absolute Genotype Effect") + 
-  scale_fill_manual(values = c("blue", "red")) +  
-  theme(legend.position = "none")
+ggsave("./Figures/6F.1.svg",
+       plot = f1, device = "svg", width = 1.5, height = 3, units = "in")
+
+
+
+f2 <- ggplot(clockSites, aes(x = NFIX_Assoc, y = abs(GenotypeEffect), fill = NFIX_Assoc)) + 
+        stat_summary(fun = "mean", geom = "col", size = 1) +
+        geom_jitter(width = 0.2, color = "grey30") + stat_pwc(label = "p = {p}") +
+        stat_summary(fun.data = "mean_cl_boot", geom = "errorbar", width = 0.2, linewidth = 2) + 
+        labs(x = "NFIX Associated?", y = "Absolute Genotype Effect") + 
+        scale_fill_manual(values = c("blue", "red")) +  
+        theme(legend.position = "none")
+
+grid.newpage()
+grid.draw(set_panel_size(f2, width  = unit(1.5, "in"), height = unit(3, "in")))
+
+
+ggsave("./Figures/6F.2.svg",
+       plot = f2, device = "svg", width = 1.5, height = 3, units = "in")
 
 
 library(GenomicRanges)
@@ -138,11 +157,6 @@ ggplot(nfixPromMeth, aes(x = AvgMeth, y = NFIX_Expr)) +
 
 nfixPromMeth$AgeBin <- meta$AgeBin[match(nfixPromMeth$ID, str_replace_all(meta$ID, "ID", "X"))]
 nfixPromMeth$Age <- meta$Age[match(nfixPromMeth$ID, str_replace_all(meta$ID, "ID", "X"))]
-
-ggplot(nfixPromMeth, aes(x = AvgMeth, y = NFIX_Expr, color = AgeBin)) + 
-  geom_point() + geom_smooth(method = "lm") + 
-  labs(x = "Region Methylation", y = "NFIX CPM") +
-  facet_wrap(~Prom, scales = "free_x")
 
 lmProm1 <- lm(NFIX_Expr ~ Age + AvgMeth, data = filter(nfixPromMeth, Prom == "Prom1"))
 lmProm2 <- lm(NFIX_Expr ~ Age + AvgMeth, data = filter(nfixPromMeth, Prom == "PromInt1"))
@@ -220,12 +234,6 @@ ggplot(nfixPromMeth, aes(x = AvgMeth, y = Exon1Perc)) +
   facet_wrap(~Prom, scales = "free_x")
 
 
-ggplot(nfixPromMeth, aes(x = AvgMeth, y = Exon1Perc, color = AgeBin)) + 
-  geom_point() + geom_smooth(method = "lm") + 
-  labs(x = "Region Methylation", y = "Exon 1 Usage \n(as % of all NFIX reads)") +
-  facet_wrap(~Prom, scales = "free_x")
-
-
 lmProm1 <- lm(Exon1Perc ~ Age*AvgMeth, data = filter(nfixPromMeth, Prom == "Prom1"))
 lmProm2 <- lm(Exon1Perc ~ Age*AvgMeth, data = filter(nfixPromMeth, Prom == "PromInt1"))
 
@@ -257,23 +265,18 @@ meta.seq$GT <- factor(nfix_gt$GT[match(meta.seq$ID, str_replace_all(nfix_gt$ID, 
 
 nfixPromMeth$GT <- meta.seq$GT[match(nfixPromMeth$ID, str_replace_all(meta.seq$ID, "ID", "X"))]
 
-
-ggplot(filter(nfixPromMeth, !is.na(GT)), aes(x = GT, y = Exon1Perc, color = GT)) + 
-  geom_boxplot() + geom_point() + 
-  labs(x = "GVAN Genotype", y = "Exon 1 Usage \n(as % of all NFIX reads)") +
-  scale_color_manual(values = c("blue", "purple", "red"), labels = c("GG", "GA", "AA"))
-
-
-ggplot(filter(nfixPromMeth, !is.na(GT)), aes(x = GT, y = Exon1Perc, color = GT)) + 
-  geom_boxplot() + geom_point() + 
-  labs(x = "GVAN Genotype", y = "Exon 1 Usage \n(as % of all NFIX reads)")  +
-  scale_color_manual(values = c("blue", "purple", "red"), labels = c("GG", "GA", "AA")) +
-  facet_wrap(~AgeBin, scales = "free_x")
-
-ggplot(filter(nfixPromMeth, !is.na(GT)), aes(x = Age, y = Exon1Perc, color = GT)) + 
+I <- ggplot(filter(nfixPromMeth, !is.na(GT)), aes(x = Age, y = Exon1Perc, color = GT)) + 
   geom_point() + geom_smooth(method = "lm") +
   labs(x = "Age", y = "Exon 1 Usage \n(as % of all NFIX reads)", color = "GT")  +
   scale_color_manual(values = c("blue", "purple", "red"), labels = c("GG", "GA", "AA"))
+
+
+grid.newpage()
+grid.draw(set_panel_size(I, width  = unit(3.5, "in"), height = unit(3, "in")))
+
+
+ggsave("./Figures/6I.svg",
+       plot = I, device = "svg", width = 3.5, height = 3, units = "in")
 
 
 lmGT <- lm(Exon1Perc ~ Age + as.numeric(GT), data = filter(nfixPromMeth, Prom == "Prom1"))
@@ -314,13 +317,22 @@ res <- as.data.frame(dxr1)
 
 #### GVAN effects on promoter methylation
 
-ggplot(filter(nfixPromMeth, !is.na(GT), 
+H <- ggplot(filter(nfixPromMeth, !is.na(GT), 
               Prom %in% c("Prom1", "Prom2")), aes(x = Age, y = AvgMeth, color = GT)) + 
   geom_point() + geom_smooth(method = "lm") +
   labs(x = "Age", y = "Promoter Methylation", color = "GT")  +
   facet_wrap(~Prom, labeller = labeller("Prom" = c("Prom1" = "DMR 1", "Prom2" = "DMR 2"))) + 
-  coord_cartesian(ylim = c(0, 100)) +
+  coord_cartesian(ylim = c(0, 100)) + theme(legend.position = "top") +
   scale_color_manual(values = c("blue", "purple", "red"), labels = c("GG", "GA", "AA"))
+
+
+grid.newpage()
+grid.draw(set_panel_size(H, width  = unit(4, "in"), height = unit(3, "in")))
+
+
+ggsave("./Figures/6H.svg",
+       plot = H, device = "svg", width = 4, height = 3, units = "in")
+
 
 lmGT.prom2 <- lm(AvgMeth ~ Age + as.numeric(GT), data = filter(nfixPromMeth, Prom == "Prom2"))
 summary(lmGT.prom2)
@@ -349,17 +361,20 @@ ggplot(filter(nfixPromMeth, !is.na(GT),
   geom_point() + geom_smooth(method = "lm") +
   labs(x = "NFIXb CPM", y = "mTOR CPM")
 
-ggplot(filter(nfixPromMeth, !is.na(GT), 
-              Prom %in% c("Prom1")), aes(x = Age, y = mtor, color = GT)) + 
-  geom_point() + geom_smooth(method = "lm", alpha = 0) +
-  labs(x = "Age", y = "mTOR CPM")  +
-  scale_color_manual(values = c("blue", "purple", "red"), labels = c("GG", "GA", "AA"))
-
-ggplot(filter(nfixPromMeth, !is.na(GT), 
+J <- ggplot(filter(nfixPromMeth, !is.na(GT), 
               Prom %in% c("Prom1")), aes(x = NFIX_Expr, y = mtor, color = GT)) + 
-  geom_point() + geom_smooth(method = "lm") +
-  labs(x = "NFIXb CPM", y = "mTOR CPM", color = "GT")  +
-  scale_color_manual(values = c("blue", "purple", "red"), labels = c("GG", "GA", "AA"))
+        geom_point() + geom_smooth(method = "lm") +
+        labs(x = "NFIXb CPM", y = "mTOR CPM", color = "GT")  +
+        scale_color_manual(values = c("blue", "purple", "red"), labels = c("GG", "GA", "AA"))
+
+
+grid.newpage()
+grid.draw(set_panel_size(J, width  = unit(3.5, "in"), height = unit(3, "in")))
+
+
+ggsave("./Figures/6J.svg",
+       plot = J, device = "svg", width = 3.5, height = 3, units = "in")
+
 
 nfixPromMeth$Gonad_sex <- meta$Gonad_sex[match(nfixPromMeth$ID, str_replace_all(meta$ID, "ID", "X"))]
 
