@@ -4,7 +4,7 @@ library(data.table)
 library(grid)
 library(egg)
 
-setwd("")
+setwd(".")
 
 
 theme_set(theme_bw() + 

@@ -5,7 +5,7 @@ library(splines)
 library(grid)
 library(egg)
 
-setwd("")
+setwd(".")
 
 
 theme_set(theme_bw() + 
@@ -33,7 +33,7 @@ entropy_res <- read.csv("./Clocks/EntropyClock_LOOCV_res.csv",
 
 
 entropy.test.lm <- lm(EntropyAge ~ Age + Gonad_sex, data = entropy_res)
-summary(prom.test.lm)
+summary(entropy.test.lm)
 
 entropy_res$resids <- entropy.test.lm$residuals
 
@@ -79,7 +79,7 @@ grid.draw(set_panel_size(gex_dnam_resids,
 
 
 ggsave("./Figures/2C.svg",
-       plot = gex_dnam_resids, device = "svg", width = 3, height = 3, units = "in")
+       plot = gex_dnam_resids, device = "svg", width = 3, height = 2.5, units = "in")
 
 
 prom_dnam_resids <- ggplot(total, aes(x = CpGResids, y = PromoterResids, color = Age)) + 
@@ -140,3 +140,27 @@ grid.draw(heat.1.new)
 
 ggsave("./Figures/2A.svg",
        plot = heat.1.new, device = "svg", width = 6, height = 4.5, units = "in")
+
+
+
+
+## Calculate CI for correlation relationship using Fisher transformation
+
+rho <- cor.test(total$GEXResids, total$PromoterResids, method = "spearman")$estimate
+n <- length(total$GEXResids)
+delta <- 1.96 / sqrt(n - 3)
+
+#Lower
+tanh(atanh(rho) - delta) # -0.01
+tanh(atanh(rho) + delta) # 0.41
+
+## More conservative estimate
+
+spearman_CI <- function(x, y, alpha = 0.05){
+  rs <- cor(x, y, method = "spearman", use = "complete.obs")
+  n <- sum(complete.cases(x, y))
+  sort(tanh(atanh(rs) + c(-1,1)*sqrt((1+rs^2/2)/(n-3))*qnorm(p = alpha/2)))
+}
+
+
+spearman_CI(total$GEXResids, total$PromoterResids)

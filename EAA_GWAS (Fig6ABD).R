@@ -3,7 +3,7 @@ library(tidyverse)
 library(data.table)
 library(ggpubr)
 
-setwd("")
+setwd(".")
 
 
 theme_set(theme_bw() + 
@@ -267,6 +267,22 @@ summary(lm.test)
 write.csv(meta.seq, file = "./Code_Data/NFIX_RAD23_Genotypes.csv")
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### What genes DO show association in expression with the identified genotype?
 
 ######### All genes' expression levels - which ones do the SNP affect?
@@ -331,6 +347,10 @@ GTeffect_expr.df <- data.frame("Gene" = age_genes$Gene[-missingGenes],
 GTeffect_expr.df$p_adjusted <- p.adjust(GTeffect_expr.df$p_value, method = "holm")
 
 qq(GTeffect_expr.df$p_value)
+
+
+
+
 
 ######## All aDMC sites - are any affected by NFIX genotype?
 

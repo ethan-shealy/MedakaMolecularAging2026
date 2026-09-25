@@ -7,7 +7,7 @@ library(psych)
 library(grid)
 library(egg)
 
-setwd("")
+setwd(".")
 
 theme_set(theme_bw() + 
             theme(legend.title = element_text(size=16,face="bold"),
@@ -288,6 +288,11 @@ ggsave("./Figures/1C.svg",
 sites.tab <- as.data.frame(table(sites))[-1,]
 
 write.csv(sites.tab, "./Clocks/DNAm_loocvSites.csv", row.names = FALSE)
+
+
+
+
+
 
 
 

@@ -5,7 +5,7 @@ library(ggpubr)
 library(grid)
 library(egg)
 
-setwd("")
+setwd(".")
 
 theme_set(theme_bw() + 
             theme(legend.title = element_text(size=16,face="bold"),
@@ -77,20 +77,20 @@ clockSites$GenotypeEffectPerc <- abs(clockSites$GenotypeEffect) / sum(abs(clockS
 clockSites$NFIX_Assoc <- modelWide$NFIX_Assoc[match(clockSites$name, modelWide$response)]
 
 
-f1 <- ggplot(clockSites, aes(x = NFIX_Assoc, y = abs(V4), fill = NFIX_Assoc)) + 
-        stat_summary(fun = "mean", geom = "col", size = 1) +
-        geom_jitter(width = 0.2, color = "grey30") + stat_pwc(label = "p = {p}", y.position = 0.0115) +
-        stat_summary(fun.data = "mean_cl_boot", geom = "errorbar", width = 0.2, linewidth = 2) + 
-        labs(x = "NFIX Associated?", y = "Absolute Clock Coefficient") + 
-        scale_fill_manual(values = c("blue", "red")) +  
-        theme(legend.position = "none")
-
-grid.newpage()
-grid.draw(set_panel_size(f1, width  = unit(1.5, "in"), height = unit(3, "in")))
-
-
-ggsave("./Figures/6F.1.svg",
-       plot = f1, device = "svg", width = 1.5, height = 3, units = "in")
+#f1 <- ggplot(clockSites, aes(x = NFIX_Assoc, y = abs(V4), fill = NFIX_Assoc)) + 
+#        stat_summary(fun = "mean", geom = "col", size = 1) +
+#        geom_jitter(width = 0.2, color = "grey30") + stat_pwc(label = "p = {p}", y.position = 0.0115) +
+#        stat_summary(fun.data = "mean_cl_boot", geom = "errorbar", width = 0.2, linewidth = 2) + 
+#        labs(x = "NFIX Associated?", y = "Absolute Clock Coefficient") + 
+#        scale_fill_manual(values = c("blue", "red")) +  
+#        theme(legend.position = "none")
+#
+#grid.newpage()
+#grid.draw(set_panel_size(f1, width  = unit(1.5, "in"), height = unit(3, "in")))
+#
+#
+#ggsave("./Figures/6F.1.svg",
+#       plot = f1, device = "svg", width = 1.5, height = 3, units = "in")
 
 
 
@@ -339,6 +339,34 @@ summary(lmGT.prom2)
 
 lmGT.prom1 <- lm(AvgMeth ~ Age + as.numeric(GT), data = filter(nfixPromMeth, Prom == "Prom1"))
 summary(lmGT.prom1)
+
+### NFIX GT effect on NFIX / RAD23a expression
+
+#NFIXb
+ggplot(filter(nfixPromMeth, !is.na(GT), 
+                   Prom == "Prom1"), aes(x = Age, y = NFIX_Expr, color = GT)) + 
+  geom_point() + geom_smooth(method = "lm") +
+  labs(x = "Age", y = "NFIX Expression", color = "GT")  +
+  coord_cartesian(ylim = c(0, 100)) + theme(legend.position = "top") +
+  scale_color_manual(values = c("blue", "purple", "red"), labels = c("GG", "GA", "AA"))
+
+
+lmGT.nfixExpr <- lm(NFIX_Expr ~ Age + as.numeric(GT), data = filter(nfixPromMeth, Prom == "Prom1"))
+summary(lmGT.nfixExpr)
+
+nfixPromMeth$RAD23a_Expr <- cpm$rad23a[match(nfixPromMeth$ID, cpm$V1)]
+
+#Rad23a
+ggplot(filter(nfixPromMeth, !is.na(GT), 
+              Prom == "Prom1"), aes(x = Age, y = RAD23a_Expr, color = GT)) + 
+  geom_point() + geom_smooth(method = "lm") +
+  labs(x = "Age", y = "RAD23a Expression", color = "GT")  +
+  coord_cartesian(ylim = c(0, 100)) + theme(legend.position = "top") +
+  scale_color_manual(values = c("blue", "purple", "red"), labels = c("GG", "GA", "AA"))
+
+
+lmGT.rad23Expr <- lm(RAD23a_Expr ~ Age + as.numeric(GT), data = filter(nfixPromMeth, Prom == "Prom1"))
+summary(lmGT.rad23Expr)
 
 
 

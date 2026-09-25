@@ -6,7 +6,7 @@ library(grid)
 library(egg)
 
 
-setwd("")
+setwd(".")
 
 theme_set(theme_bw() + 
             theme(legend.title = element_text(size=16,face="bold"),
@@ -15,7 +15,7 @@ theme_set(theme_bw() +
                   strip.text = element_text(size=16,face="bold"),
                   panel.border = element_rect(fill = NA)))
 
-testMeta.seq <- read.csv("./Code_Data/Validation_GTs.csv")
+testMeta.seq <- read.csv("./Code_Data/validation_GTs.csv")
 
 testMeta.seq$GT <- factor(testMeta.seq$GT)
 

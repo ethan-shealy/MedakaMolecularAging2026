@@ -2,7 +2,7 @@ library(data.table)
 library(tidyverse)
 library(ggpubr)
 
-setwd("")
+setwd(".")
 
 theme_set(theme_bw() + 
             theme(legend.title = element_text(size=16,face="bold"),

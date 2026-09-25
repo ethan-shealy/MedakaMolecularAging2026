@@ -9,7 +9,7 @@ methBase <- "./methylBase_allSites_5x.txt"
 
 covgThreshold <- 5
 
-sampleThreshold <- 50
+sampleThreshold <- 60
 
 
 #### Run Script
@@ -162,10 +162,16 @@ missingBySample2 <- colSums(is.na(final_passed)) / nrow(final_passed)
 
 hist(missingBySample2, breaks = 12, xlim = c(0, 1))
 
-## median imputation
+## Total missingness
+sum(is.na(final_passed)) ## 3,915,594
 
-medianimpute <- function(x) ifelse(is.na(x), mean(x, na.rm=T), x)
-methImp <- apply(final_passed[,-1], 1, medianimpute)
+# % missing 
+sum(is.na(final_passed)) / (nrow(final_passed)*(ncol(final_passed)-1)) ## 13.5%
+
+## mean imputation
+
+meanimpute <- function(x) ifelse(is.na(x), mean(x, na.rm=T), x)
+methImp <- apply(final_passed[,-1], 1, meanimpute)
 
 dat.imp <- data.frame(final_passed$coord, t(methImp))
 
