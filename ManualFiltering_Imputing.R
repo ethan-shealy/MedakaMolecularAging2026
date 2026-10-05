@@ -3,13 +3,13 @@ library(data.table)
 
 #### SET PARAMETERS
 
-setwd("")
+setwd(".")
 
-methBase <- "./methylBase_allSites_5x.txt"
+methBase <- "E:/medaka/MedClock2/methylkit_raw/methylDB_2024-09-15_lCC/methylBase_allSites_5x.txt"
 
 covgThreshold <- 5
 
-sampleThreshold <- 60
+sampleThreshold <- 40
 
 
 #### Run Script

@@ -146,21 +146,10 @@ ggsave("./Figures/2A.svg",
 
 ## Calculate CI for correlation relationship using Fisher transformation
 
-rho <- cor.test(total$GEXResids, total$PromoterResids, method = "spearman")$estimate
+rho <- cor.test(total$CpGResids, total$GEXResids, method = "spearman")$estimate
 n <- length(total$GEXResids)
 delta <- 1.96 / sqrt(n - 3)
 
 #Lower
 tanh(atanh(rho) - delta) # -0.01
 tanh(atanh(rho) + delta) # 0.41
-
-## More conservative estimate
-
-spearman_CI <- function(x, y, alpha = 0.05){
-  rs <- cor(x, y, method = "spearman", use = "complete.obs")
-  n <- sum(complete.cases(x, y))
-  sort(tanh(atanh(rs) + c(-1,1)*sqrt((1+rs^2/2)/(n-3))*qnorm(p = alpha/2)))
-}
-
-
-spearman_CI(total$GEXResids, total$PromoterResids)

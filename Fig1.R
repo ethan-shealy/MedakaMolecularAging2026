@@ -290,11 +290,25 @@ sites.tab <- as.data.frame(table(sites))[-1,]
 write.csv(sites.tab, "./Clocks/DNAm_loocvSites.csv", row.names = FALSE)
 
 
+# Get missingness of sites
 
+sites.tab <- read.csv("./Clocks/DNAm_loocvSites.csv")
 
+CpG.unimputed <- fread(file = "./5x_50ind_manualFilt.tab", header = TRUE, sep = "\t", data.table = FALSE)
 
+unimputed.loocv.sites <- CpG.unimputed[match(sites.tab$sites, CpG.unimputed$coord), which(colnames(CpG.unimputed) %in% colnames(CpG))]
 
+missingBySite <- rowSums(is.na(unimputed.loocv.sites)); sum(missingBySite); sum(missingBySite) / (ncol(unimputed.loocv.sites)*nrow(unimputed.loocv.sites)) # 17.9%
 
+sites.tab$Missing <- missingBySite
+
+cor(sites.tab$Freq, sites.tab$Missing)
+
+sites.tab$MissingTotal <- sites.tab$Missing * sites.tab$Freq
+
+sum(sites.tab$MissingTotal); sum(sites.tab$MissingTotal) / (sum(sites.tab$Freq)*ncol(CpG)) # 17.5%
+
+rm(CpG.unimputed)
 
 ##### Gene-expression based clock
 
